@@ -105,8 +105,21 @@ if (!function_exists('lang')){
      */
 
     function lang(){
-        if(!isset($_SESSION['lang'])) $_SESSION['lang'] = getDefaultLang();
-        return $_SESSION['lang'];
+        if(session()->has('lang')) session('lang',getDefaultLang());
+        return session('lang');
+    }
+}
+
+if (!function_exists('lang')){
+    /**
+     * Custom function to language from session.
+     *
+     * @return string
+     */
+
+    function lang(){
+        if(session()->has('lang')) session('lang',getDefaultLang());
+        return session('lang');
     }
 }
 

@@ -12,4 +12,8 @@
 */
 
 Route::get('/', 'InstallController@preload');
+Route::get('{page}', function (){
+    return redirect('/');
+});
 Route::post('/', 'InstallController@start');
+

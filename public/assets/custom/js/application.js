@@ -1,8 +1,8 @@
 function App() {
-	this.timers = [];
+	this.timers = {};
 	this.timer = 0;
 	this.selectors = ['.ajax_request'];
-	this.elements = [];
+	this.elements = {};
 	this.preloader();
 	this.tryLoadPage = 0;
 }
@@ -12,20 +12,26 @@ App.prototype = {
 		var self = this;
 		for (var k = 0; k < self.selectors.length; k++)
 			for (var i = 0; i < $(self.selectors[k]).length; i++) {
-				c = m = p = "";
 				element = $(self.selectors[k] + ':eq(' + i + ')');
-				if (element.attr('data-controller')) c = element.attr('data-controller');
-				if (element.attr('data-method')) m = element.attr('data-method');
+				u = p = '';
+				if (element.attr('data-url')) u = element.attr('data-url');
 				if (element.attr('data-post')) p = element.attr('data-post');
 
-				if (c.length > 0 || m.length > 0) self.elements.push({controller: c, method: m, post: p});
-				element.removeAttr('data-controller');
-				element.removeAttr('data-method');
-				element.removeAttr('data-post');
-				if (c.length > 0 || m.length > 0) element.click(function (event) {
+				if (u.length >0) self.elements['sel'+i]= {controller:u,post:p};
+				element.removeAttr('data-url');
+
+				if (u.length > 0&&$(self.selectors[k] + ':eq(' + i + ')').prop('tagName')!=='FORM') element.click(function (event) {
 					event.preventDefault();
 					index = $(this).index(self.selectors[0]);
-					self.sendRequest(self.elements[index]);
+					self.sendRequest(self.elements['sel'+index]);
+					return false;
+				});
+
+				if (u.length > 0&&$(self.selectors[k] + ':eq(' + i + ')').prop('tagName')=='FORM') element.submit(function(event){
+					event.preventDefault();
+					index = $(this).index(self.selectors[0]);
+					self.sendRequest(self.elements['sel'+index]);
+					return false;
 				});
 			}
 	},
@@ -35,7 +41,6 @@ App.prototype = {
 		var self = this;
 		var post = {};
 		if (el.controller) url += el.controller;
-		if (el.method) url += '/' + el.method;
 		if (el.post) post = JSON.parse(el.post);
 		post._token = $('#_token').val();
 		if (url.length == 0) return;
@@ -45,24 +50,12 @@ App.prototype = {
 			data: post,
 			method: 'POST',
 			dataType: "json",
-			xhrFields: {
-				onprogress: function (e) {
-					if (e.lengthComputable) {
-						if ($('.preloader-wrapper').length > 0) $('preloader t').html(e.loaded / e.total * 100 + '%');
-					}
-				}
-			},
 			success: function (data) {
 				APPLICATION.tryLoadPage = 0;
-				if ($('.preloader-wrapper').length > 0) {
-					$('.preloader-wrapper').remove();
+				if ($('.wrapper_preload').length > 0) {
+					$('.wrapper_preload').remove();
 					$('body').append(data[0].html);
-					$('body').append(data[1].html);
 					self.removeAttributes();
-					$.getScript(self.materialize, function (data) {
-						$('.button-collapse').sideNav({'edge': 'left'});
-						return false;
-					});
 				}
 
 				self.responseJob(data);
@@ -73,7 +66,7 @@ App.prototype = {
 					setTimeout(function () {
 						self.sendRequest(el);
 					}, 2000);
-				} else if ($('.preloader-wrapper').length > 0) location.replace(HOME_URL+'/'+url); else alert('Cannot load page ' + url);
+				} else if ($('.wrapper_preload').length > 0) location.replace(HOME_URL+'/'+url); else alert('Cannot load page ' + url);
 			}
 		});
 		return false;
@@ -99,78 +92,97 @@ App.prototype = {
 			}
 		});
 	},
-	updateElement: function (el) {
+	animateElementCSS: function (el) {
+		$(el.target).animateCss(el.effect);
+	},
+	updateElement: function(el){
 		$(el.target).html(el.html);
 		if (el.effect) $(el.target).animateCss(el.effect);
 	},
-	addElement: function (el) {
+	addElement: function(el){
 		$(el.target).append(el.html);
 		if (el.effect) $(el.name).animateCss(el.effect);
 	},
-	hideElement: function (el) {
+	hideElement: function(el){
 		$(el.target).hide();
 	},
-	deleteElement: function (el) {
+	deleteElement: function(el){
 		$(el.target).remove();
 	},
-	setTimers: function () {
+	setTimers: function(){
 		var self = this;
-		for (var i = 0; i < $('timer').length; i++) {
-			element = $('timer:eq(' + i + ')');
+		for(var i=0;i<$('timer').length;i++){
+			element = $('timer:eq('+i+')');
 			start = parseInt(element.attr('data-start'));
 			if (!start) continue;
 			var finish = new Date().addTime(start);
 			var nObject = {
 				link: element.attr('data-target'),
-				action: element.attr('data-action'),
+				action:element.attr('data-action'),
+				target:element.attr('data-target'),
+				animation:element.attr('data-animation'),
+				start:start,
 				el: element,
 				finish: finish,
 				timer: 0
 			};
-			self.timers.push(nObject);
+			self.timers[$(element).attr('id')] = nObject;
 			element.removeAttr('data-start');
 			element.removeAttr('data-target');
 			element.removeAttr('data-action');
-			if (i == $('timer').length - 1)self.timer = setInterval(self.startTimer, 1000);
+			if (i==$('timer').length-1) self.timer = setInterval(self.startTimer,1000);
 		}
 	},
-	startTimer: function () {
+	startTimer: function (){
 		var self = this;
-		for (var k = 0; k < APPLICATION.timers.length; k++) {
-			el = APPLICATION.timers[k];
-			time = parseInt((el.finish - new Date) / 1000);
-			if (time < 0) {
-				if (el.action == 'sendRequest') APPLICATION.sendRequest({controller: el.link});
-				APPLICATIONE.timers.splice(k, 1);
-			} else {
+
+		$.each(APPLICATION.timers, function(i,v){
+			el = APPLICATION.timers[i];
+			time = parseInt((el.finish - new Date)/1000);
+			if (time<0) {
+				if(el.action=='sendRequest') APPLICATION.sendRequest({controller:el.link});
+				if(el.action=='cssElement') {
+					console.log(el);
+					$(el.link).animateCss(el.animation);
+					APPLICATION.resetTimer({element:'#'+$(el.el).attr('id'),start:el.start,target:el.target,action:el.action,animation:el.animation});
+				}
+				delete APPLICATION.timers[i];
+			}else {
 				minutes = parseInt(time / 60);
 				sec = time - minutes * 60;
 				if (sec < 10) sec = '0' + sec;
 				el.el.html(minutes + ':' + sec);
 			}
-		}
+		});
+
 	},
-	resetTimer: function (el) {
+	resetTimer:function (el) {
 		element = $(el.element);
 		start = parseInt(el.start);
 		var finish = new Date().addTime(start);
 		var nObject = {
 			link: el.target,
-			action: el.type,
+			action:el.type,
+			animation:el.animation,
+			target:el.target,
+			start:el.start,
 			el: element,
 			finish: finish,
 			timer: 0
 		};
-		GAME.timers.push(nObject);
+		APPLICATION.timers[$(element).attr('id')] = nObject;
 	},
 	animateElement: function (el) {
-		if (el.out) {
-			$(el.name + ' ' + el.block).fadeOut(200);
-			el.time = parseInt(el.time) + 200;
+		if(el.out){
+			$(el.name+' '+el.block).fadeOut(200);
+			el.time = parseInt(el.time)+200;
 		}
-		$(el.name).animate(el.animate, el.time);
-		if (el.in && el.block)    $(el.name + ' ' + el.block).delay(parseInt(el.time)).fadeIn(200);
+		$(el.name).animate(el.animate,el.time);
+		if (el.in&&el.block)	$(el.name+' '+el.block).delay(parseInt(el.time)).fadeIn(200);
 
+	},
+	cssElement: function (el) {
+		$(el.name).css(el.css);
 	},
 	cssElement: function (el) {
 		$(el.name).css(el.css);
@@ -185,4 +197,4 @@ App.prototype = {
 		});
 		$('.content').html(el.html);
 	}
-}
+};
