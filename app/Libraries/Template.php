@@ -45,7 +45,7 @@ class Template extends BaseController{
         self::$_response[] = $data;
     }
 
-    public function render($view,$data = array(),$js = null){
+    public function render($view,$data = array(),$js = null,$target = '.body'){
 
 		if(!isAjax()) {
 				if(!empty(config('database.connections.DB1.host'))){
@@ -58,8 +58,13 @@ class Template extends BaseController{
 					echo $this->view('template.install_footer',$data);
 				}
         }else {
-            if (is_null($js) or empty($js)) $this->renderJson(array('action'=>'load','html'=>view($view)->with($data)->render()));
-            else $this->renderJson(array('action'=>'load','html'=>view($view)->with($data)->render(),'js'=>$js));
+            $action = array(
+                'action'=>'load',
+                'html'=>view($view)->with($data)->render(),
+                'target'=>$target
+            );
+            if (!is_null($js) or !empty($js)) $action['js'] = $js;
+            $this->renderJson($action);
         }
         return ;
     }

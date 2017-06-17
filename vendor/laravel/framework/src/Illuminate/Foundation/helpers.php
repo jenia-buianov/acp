@@ -16,7 +16,12 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+if (!function_exists('data_to_attribute')){
 
+    function data_to_attribute($array){
+        return htmlentities(json_encode($array), ENT_QUOTES, 'UTF-8');;
+    }
+}
 
 function rus2translit($string) {
     $converter = array(
@@ -160,6 +165,7 @@ if (! function_exists('makeData')) {
     {
         $data = array();
         $values = array();
+
         foreach ($post as $k=>$v){
             $post[$k]['name'] = str_replace(array_keys($replaceCharset), array_values($replaceCharset), $post[$k]['name']);
             $post[$k]['value'] =  str_replace(array_keys($replaceCharset), array_values($replaceCharset), $post[$k]['value']);
@@ -170,8 +176,8 @@ if (! function_exists('makeData')) {
             if (!in_array($v,$values)) $date['error'].=', '.$v;
         }
 
-        if (mb_strlen($date['error']) > 0) {
-            $date['error'] = mb_substr($date['error'], 2) . ' not entered';
+        if (!empty($date['error'])) {
+            $date['error'] = mb_substr($date['error'], 2) . ' '.__('install.not_entered');
             return $data;
         }
 
@@ -188,8 +194,8 @@ if (! function_exists('makeData')) {
             if (!in_array($val['name'],$ignore)) $data[$val['name']] = $value;
         }
 
-        if (mb_strlen($date['error']) > 0) {
-            $date['error'] = mb_substr($date['error'], 2) . ' not entered';
+        if (!empty($date['error'])) {
+            $date['error'] = mb_substr($date['error'], 2) . ' '.__('install.not_entered');
             return $data;
         }
 

@@ -5,6 +5,7 @@ function App() {
 	this.elements = {};
 	this.preloader();
 	this.tryLoadPage = 0;
+    this.notificationTimer = false;
 }
 App.prototype = {
 
@@ -30,6 +31,38 @@ App.prototype = {
 				if (u.length > 0&&$(self.selectors[k] + ':eq(' + i + ')').prop('tagName')=='FORM') element.submit(function(event){
 					event.preventDefault();
 					index = $(this).index(self.selectors[0]);
+
+					var valuesArray = {};
+					var alerts = "";
+					$(element).find('input, select, textarea').each(function(e,v)
+					{
+						$(v).parents('.form-group').removeClass('has-error');
+						if(v.placeholder==undefined) v.placeholder = $(v).attr('data-placeholder');
+						valuesArray[e] = {'value':v.value,'name':v.name,'must':parseInt($(v).attr('must')),'title':v.placeholder};
+						if (parseInt($(v).attr('must'))==1&&v.value.length==0) {
+							$(v).parents('.form-group').addClass('has-error');
+							alerts+=", "+v.placeholder;
+						}
+
+					});
+					if (alerts.length>0)
+					{
+						self.showNotification({title:LANG.not_entered_all,type:"danger",text:alerts.substr(2)+' '+LANG.not_entered});
+						return false;
+					}
+					post = {
+						values:valuesArray
+					};
+
+					if (self.elements['sel'+index].controller=='install/finish'){
+						post['DATABASE'] = DB;
+						post['USERS'] = USERS;
+						post['HOSTS'] = HOSTS;
+						post['PASS'] = PASSWORDS;
+						post['MAIN'] = MAINDB;
+					}
+
+					self.elements['sel'+index].post = JSON.stringify(post);
 					self.sendRequest(self.elements['sel'+index]);
 					return false;
 				});
@@ -57,7 +90,7 @@ App.prototype = {
 					$('body').append(data[0].html);
 					self.removeAttributes();
 				}
-
+				else
 				self.responseJob(data);
 			},
 			error: function (response) {
@@ -75,23 +108,30 @@ App.prototype = {
 		var self = this;
 
 		$.each(el, function (i, v) {
-			if (v.action == 'update') self.updateElement(v);
-			if (v.action == 'add') self.addElement(v);
-			if (v.action == 'hide') self.hideElement(v);
-			if (v.action == 'delete') self.deleteElement(v);
-			if (v.action == 'reset') self.resetTimer(v);
-			if (v.action == 'animate') self.animateElement(v);
-			if (v.action == 'css') self.cssElement(v);
-			if (v.action == 'load') self.loadPage(v);
+            if (v.action=='update') self.updateElement(v);
+            if (v.action=='add') self.addElement(v);
+            if (v.action=='hide') self.hideElement(v);
+            if (v.action=='delete') self.deleteElement(v);
+            if (v.action=='reset') self.resetTimer(v);
+            if (v.action=='animate') self.animateElement(v);
+            if (v.action=='animateCss') self.animateElementCSS(v);
+            if (v.action=='css') self.cssElement(v);
+            if (v.action=='load') self.loadPage(v);
+            if (v.action=='modal') self.showModal(v);
+            if (v.action=='notification') self.showNotification(v);
+            if (v.action=='addclass') self.aClass(v);
 
 
 			if (i == el.length - 1) {
 				self.removeAttributes();
 				self.setTimers();
-				$.getScript(self.materialize, function (data) {});
 			}
 		});
 	},
+    aClass: function (el) {
+        if (el.rt) $(el.target).removeClass(el.rt);
+        $(el.target).addClass(el.class);
+    },
 	animateElementCSS: function (el) {
 		$(el.target).animateCss(el.effect);
 	},
@@ -142,7 +182,6 @@ App.prototype = {
 			if (time<0) {
 				if(el.action=='sendRequest') APPLICATION.sendRequest({controller:el.link});
 				if(el.action=='cssElement') {
-					console.log(el);
 					$(el.link).animateCss(el.animation);
 					APPLICATION.resetTimer({element:'#'+$(el.el).attr('id'),start:el.start,target:el.target,action:el.action,animation:el.animation});
 				}
@@ -181,11 +220,72 @@ App.prototype = {
 		if (el.in&&el.block)	$(el.name+' '+el.block).delay(parseInt(el.time)).fadeIn(200);
 
 	},
+    showModal: function (el) {
+        var self = this;
+        if($('modal').length>0&&self.modalWindowOnly) return ;
+        if($('modal').length>0&&el.delPrev) $('modal').remove();
+        if(el.onlyThis) self.modalWindowOnly = true;
+        if (el.js) $.getScript(el.js, function(data) {});
+        if (el.loadCSS) {
+            $("<link/>", {
+                rel: "stylesheet",
+                type: "text/css",
+                href: el.loadCSS
+            }).appendTo("head");
+        }
+        html = "<modal";
+        if (el.modal&&!el.effect) html+=" style='"+el.modal+"'";
+        if (!el.modal&&el.effect) html+=" style='display:inline;'";
+        if (el.modal&&el.effect) html+=" style='display:inline;"+el.modal+"'";
+        if (el.class) html+=" class='"+el.class+"'";
+        html+=">\n";
+        if(el.notClosed) html+="<background></background>\n";
+        else html+="<background onclick='APPLICATION.removeModal(this)'></background>\n";
+        html+="<content";
+        if (el.style) html+=" style='"+el.style+"'";
+
+        html+=">"+el.html;
+        html+="</content><bottom></bottom></modal>";
+        $('body').append(html);
+        if (el.effect) $('modal:last-child').animateCss(el.effect);
+        else $('modal:last-child').fadeIn(300);
+        if (el.textEffect) setTimeout(function () {
+            $('modal:last-child content').css('display','block');
+            $('modal:last-child content').animateCss(el.textEffect);
+        },500);
+    },
+    showNotification: function (el) {
+        var self = this;
+        if($('notification').length>0){
+            self.deleteElement({target: "notification"});
+            clearTimeout(self.notificationTimer);
+            self.notificationTimer = 0;
+        }
+
+        html = '<notification class="'+el.type+'"';
+        if (el.css) html+=' style="'+el.css+'"';
+        html+='>';
+        if(el.title) html+='<title>'+el.title+'</title>';
+        if(el.text) html+='<text>'+el.text+'</text>';
+        html+='</notification>';
+
+        $('body').append(html);
+        $('notification').animateCss('fadeInRight');
+        if (!el.time)  el.time = 4;
+
+        self.notificationTimer = setTimeout(function(){
+            clearTimeout(self.notificationTimer);
+            self.notificationTimer = 0;
+            $('notification').animateCss('fadeOutRight');
+            setTimeout(function () {
+                self.deleteElement({target: "notification"});
+            },500);
+        },el.time*1000);
+
+    },
 	cssElement: function (el) {
-		$(el.name).css(el.css);
-	},
-	cssElement: function (el) {
-		$(el.name).css(el.css);
+    	console.log(el);
+		$(el.target).css(el.css);
 	},
 	preloader: function () {
 		var self = this;
@@ -193,8 +293,29 @@ App.prototype = {
 	},
 	loadPage: function (el) {
 		var self = this;
+
 		if (el.js) $.getScript(el.js, function (data) {
 		});
-		$('.content').html(el.html);
-	}
+		$(el.target).html(el.html);
+	},
+    removeModal: function (el) {
+        $($(el).parents('modal')).remove();
+    },
+    getEsc: function () {
+        $(document).on('keyup keydown',function(e) {
+            if (e.keyCode == 27 &&$('modal').length>0) {
+                $('modal:last-child').remove();
+            }
+
+        });
+    },
 };
+
+$.fn.extend({
+    animateCss: function (animationName) {
+        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+        this.addClass('animated ' + animationName).one(animationEnd, function() {
+            $(this).removeClass('animated ' + animationName);
+        });
+    }
+});

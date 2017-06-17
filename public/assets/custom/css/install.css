@@ -1,5 +1,6 @@
 @import url(../../libraries/bootstrap/css/bootstrap.laravel.css);
 @import url(../../libraries/bootstrap/css/bootstrap.min.css);
+@import url(../css/notifications.css);
 @import url("https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i");
 button, text, input, textarea, .form-control, .btn {
   font-size: 15px; }
@@ -41,6 +42,25 @@ h4 {
   padding: 1em;
   border-radius: 10px; }
 
+.btn-default {
+  border: 1px solid #e0e0e0; }
+
+.languages {
+  min-width: 150px; }
+  .languages li {
+    padding: 1em;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent; }
+  .languages li:hover {
+    background-color: #5cb85c;
+    border-color: #f1f2f7;
+    color: #fff; }
+  .languages img {
+    width: 50px;
+    max-height: 35px; }
+
 .panel {
   margin-bottom: 20px;
   background-color: #fff;
@@ -78,7 +98,7 @@ h4 {
     display: block; }
     .panel .tabs li {
       display: inline-block;
-      width: 30%;
+      width: 22%;
       margin-left: 1%;
       text-align: center;
       background-color: #eee;

@@ -16,4 +16,7 @@ Route::get('{page}', function (){
     return redirect('/');
 });
 Route::post('/', 'InstallController@start');
+Route::post('/setup', 'InstallController@setup');
+Route::post('/verify', 'InstallController@verify');
+Route::post('install/finish', 'InstallController@lastStep');
 

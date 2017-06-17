@@ -46,12 +46,13 @@ function verifyDB() {
 	count = $('#databases h4').length;
 	if (count>1)
 	{
-		var main = prompt("Please enter main Database from 1 to "+count);
+		var main = prompt(LANG.mainDB+count);
 		if (main<1||main>count)
 		{
 			alert('You entered wrong number. Please try again');
 			verifyDB();
 		}
+		MAINDB = main;
 	}
 
 	HOSTS = [];
@@ -63,10 +64,6 @@ function verifyDB() {
 	for(i=0;i<count;i++){
 		k = i*4;
 
-		console.log(k);
-		console.log(k+1);
-		console.log(k+2);
-		console.log(k+3);
 		$('#databases .form-group:eq('+k+')').removeClass('has-error');
 		$('#databases .form-group:eq('+(k+1)+')').removeClass('has-error');
 		$('#databases .form-group:eq('+(k+2)+')').removeClass('has-error');
@@ -100,19 +97,32 @@ function verifyDB() {
 		else DB.push($('#databases input:eq('+(k+3)+')').val());
 	}
 
-
-	console.log(HOSTS);
-	console.log(USERS);
-	console.log(DB);
-	console.log(PASSWORDS);
-
 	if (alerts.length>1) {
-		$('.bg-danger:eq(2)').html(alerts);
+		$('.bg-danger:eq(2)').html(alerts.substr(0,alerts.length-2)+' '+LANG.not_entered);
 		$('.bg-danger:eq(2)').css('display','block');
 		$('html, body').animate({
 			scrollTop: $(".bg-danger:eq(2)").offset().top-30
 		}, 500);
+		return ;
 	}
 
 
+	post = JSON.stringify({
+		hosts:HOSTS,
+		users:USERS,
+		db:DB,
+		pass:PASSWORDS
+	});
+	APPLICATION.sendRequest({
+		controller: "verify",
+		post:post
+	});
+
+
+}
+
+function setAdmin(e) {
+	tg = $(e).attr('name');
+	tag = tg.charAt(0).toUpperCase() + tg.slice(1);
+	$('input[name="admin'+tag+'"]').val($(e).val());
 }
