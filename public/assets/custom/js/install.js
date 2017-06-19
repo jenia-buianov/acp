@@ -59,7 +59,9 @@ function verifyDB() {
 	USERS = [];
 	DB = [];
 	PASSWORDS = [];
+    SELECTED = $('input[name="db"]:checked').val();
 	alerts = '';
+    $('.bg-danger:eq(2)').css('display','none');
 
 	for(i=0;i<count;i++){
 		k = i*4;
@@ -111,7 +113,9 @@ function verifyDB() {
 		hosts:HOSTS,
 		users:USERS,
 		db:DB,
-		pass:PASSWORDS
+		pass:PASSWORDS,
+        selected:SELECTED,
+        main:MAINDB
 	});
 	APPLICATION.sendRequest({
 		controller: "verify",
@@ -125,4 +129,43 @@ function setAdmin(e) {
 	tg = $(e).attr('name');
 	tag = tg.charAt(0).toUpperCase() + tg.slice(1);
 	$('input[name="admin'+tag+'"]').val($(e).val());
+}
+
+function checkedTable(e) {
+    table = $(e).val();
+    checked_ = $(e).prop('checked');
+    if (checked_) {
+        $('select[name="table_'+table+'"]').prop('disabled', true);
+        ct = $.trim($('#create_table').val());
+        ct = ct.split(',');
+        ct.push(table);
+        $('#create_table').val(ct.join(','));
+        $('.rows_'+table).html('');
+    }
+    else {
+        $('select[name="table_'+table+'"]').prop('disabled', false);
+        ct = $.trim($('#create_table').val());
+        ct = ct.split(',');
+        newCT = [];
+        for(i=0;i<ct.length;i++)
+           if(ct[i]!==table) newCT.push(ct[i]);
+        $('#create_table').val(newCT.join(','));
+    }
+}
+
+function selectRow(e){
+    table = $(e).attr('name').split('_');
+    table = table[1];
+    sel = $(e).val();
+
+    $('rows_'+table).css('display','block');
+    post = JSON.stringify({
+        host:HOSTS[MAINDB-1],
+        user:USERS[MAINDB-1],
+        db:DB[MAINDB-1],
+        pass:PASSWORDS[MAINDB-1],
+        table:table,
+        sel:sel
+    });
+    APPLICATION.sendRequest({controller:'findRows',post:post});
 }

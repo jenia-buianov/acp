@@ -1,0 +1,46 @@
+notification{
+    position: fixed;
+    top:0.5em;
+    right:0.5em;
+    width: 10em;
+    min-height: 3em;
+    display: block;
+    z-index: 9999;
+}
+
+notification.danger{
+    background-color: #F44336;
+    color:white;
+    padding: 1em;
+    width: 25em;
+    min-height: 3em;
+    display: block;
+    text-align: right;
+    border-radius: 10px;
+}
+
+notification.success{
+    background-color: #3ebeb8;
+    color:white;
+    padding: 1em;
+    width: 25em;
+    min-height: 3em;
+    display: block;
+    text-align: right;
+    border-radius: 10px;
+}
+
+notification title{
+    font-size: 1.5em;
+    display: block;
+    width:100%;
+    text-align: right;
+}
+
+
+notification text{
+    font-size: 1em;
+    display: block;
+    width:100%;
+    text-align: right;
+}

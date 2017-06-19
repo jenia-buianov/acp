@@ -78,7 +78,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-server" aria-hidden="true"></i>
                             </div>
-                            <input type="text" class="form-control" name="host[]" placeholder="{{__('install.host')}}" value="localhost" must="1">
+                            <input type="text" class="form-control" name="host[]" placeholder="{{__('install.host')}}" value="82.163.178.67" must="1">
                         </div>
                     </div>
 
@@ -88,7 +88,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-user" aria-hidden="true"></i>
                             </div>
-                            <input type="text" class="form-control" name="user[]" placeholder="{{__('install.user')}}" must="1">
+                            <input type="text" class="form-control" name="user[]" placeholder="{{__('install.user')}}" must="1" value="buianove_root">
                         </div>
                     </div>
 
@@ -98,7 +98,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-key" aria-hidden="true"></i>
                             </div>
-                            <input type="password" class="form-control" name="password[]" placeholder="{{__('install.password')}}" must="1">
+                            <input type="password" class="form-control" name="password[]" placeholder="{{__('install.password')}}" must="1" value="Qq4541201096">
                         </div>
                     </div>
 
@@ -108,7 +108,7 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-table" aria-hidden="true"></i>
                             </div>
-                            <input type="text" class="form-control" name="databases[]" placeholder="{{__('install.db_title')}}" must="1">
+                            <input type="text" class="form-control" name="databases[]" placeholder="{{__('install.db_title')}}" must="1" value="buianove_acp">
                         </div>
                     </div>
 
@@ -123,54 +123,8 @@
                 <button class="btn btn-danger" type="button" id="b" style="position: absolute; bottom: 0px; right: 2em;margin-bottom: 2em" onclick="verifyDB()">{{__('install.db_connection')}}</button>
             </text>
             <text>
-                <p style="display: none">
-                    {{__('install.step4')}}
-                    <br>
-                    <br>
-                    <div class="bg-danger" id="alert"></div>
+                <p>
 
-                    <div class="form-group" style="display: none">
-                        <label class="sr-only">{{__('install.name')}}</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-male" aria-hidden="true"></i>
-                            </div>
-                            <input type="text" class="form-control" name="adminName" placeholder="{{__('install.name')}}" must="1" value="">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="display: none">
-                        <label class="sr-only">{{__('install.login')}}</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-user" aria-hidden="true"></i>
-                            </div>
-                            <input type="text" class="form-control" name="adminLogin" value="admin" placeholder="{{__('install.login')}}" must="1">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="display: none">
-                        <label class="sr-only">{{__('install.email')}}</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-envelope-o" aria-hidden="true"></i>
-                            </div>
-                            <input type="email" class="form-control" name="adminEmail" value="" placeholder="{{__('install.email')}}" must="1">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="display: none">
-                        <label class="sr-only">{{__('install.password')}}</label>
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-key" aria-hidden="true"></i>
-                            </div>
-                            <input type="password" class="form-control" name="adminPassword" placeholder="{{__('install.password')}}" must="1">
-                        </div>
-                    </div>
-
-
-                    <button class="btn btn-danger" type="submit" style="display:none;position: absolute; bottom: 0px; right: 2em;margin-bottom: 2em">{{__('install.finish')}}</button>
                 </p>
             </text>
         </form>

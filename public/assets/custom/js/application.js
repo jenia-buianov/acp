@@ -36,13 +36,31 @@ App.prototype = {
 					var alerts = "";
 					$(element).find('input, select, textarea').each(function(e,v)
 					{
-						$(v).parents('.form-group').removeClass('has-error');
-						if(v.placeholder==undefined) v.placeholder = $(v).attr('data-placeholder');
-						valuesArray[e] = {'value':v.value,'name':v.name,'must':parseInt($(v).attr('must')),'title':v.placeholder};
-						if (parseInt($(v).attr('must'))==1&&v.value.length==0) {
-							$(v).parents('.form-group').addClass('has-error');
-							alerts+=", "+v.placeholder;
-						}
+					    if (!$(v).prop('disabled')&&v.type!=='checkbox'&&v.name.length>0) {
+					        $(v).parents('.form-group').removeClass('has-error');
+                            if (v.type !== 'radio') {
+                                if (v.placeholder == undefined) v.placeholder = $(v).attr('data-placeholder');
+                                valuesArray[e] = {
+                                    'value': v.value,
+                                    'name': v.name,
+                                    'must': parseInt($(v).attr('must')),
+                                    'title': v.placeholder
+                                };
+                            }
+                            else {
+                                if (v.placeholder == undefined) v.placeholder = $(v).attr('data-placeholder');
+                                valuesArray[e] = {
+                                    'value': $('input[name="' + v.name + '"]:checked'),
+                                    'name': v.name,
+                                    'must': parseInt($(v).attr('must')),
+                                    'title': v.placeholder
+                                };
+                            }
+                            if (parseInt($(v).attr('must')) == 1 && v.value.length == 0) {
+                                $(v).parents('.form-group').addClass('has-error');
+                                alerts += ", " + v.placeholder;
+                            }
+                        }
 
 					});
 					if (alerts.length>0)
@@ -54,6 +72,7 @@ App.prototype = {
 						values:valuesArray
 					};
 
+                    console.log(valuesArray);
 					if (self.elements['sel'+index].controller=='install/finish'){
 						post['DATABASE'] = DB;
 						post['USERS'] = USERS;
@@ -62,6 +81,7 @@ App.prototype = {
 						post['MAIN'] = MAINDB;
 					}
 
+                    console.log(post);
 					self.elements['sel'+index].post = JSON.stringify(post);
 					self.sendRequest(self.elements['sel'+index]);
 					return false;

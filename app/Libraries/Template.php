@@ -48,7 +48,7 @@ class Template extends BaseController{
     public function render($view,$data = array(),$js = null,$target = '.body'){
 
 		if(!isAjax()) {
-				if(!empty(config('database.connections.DB1.host'))){
+				if(!empty(config('database.connections.DB0.host'))){
 					echo $this->view('template.header',$data);
 					echo $this->view($view,$data);
 					echo $this->view('template.footer',$data);
