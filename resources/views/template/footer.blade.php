@@ -3,6 +3,7 @@
     <script src="{{asset('assets/libraries/jquery.min.js')}}"></script>
     <script src="{{asset('assets/custom/js/application.js')}}"></script>
     <script src="{{asset('assets/libraries/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{asset('assets/languages/'.lang().'.js')}}"></script>
     <script>
         APPLICATION = new App({});
     </script>

@@ -9,7 +9,7 @@
         <!--Import materialize.css-->
         <link type="text/css" rel="stylesheet" href="{{asset('assets/libraries/font-awesome/css/font-awesome.min.css')}}"  media="screen,projection"/>
 
-        <link href="{{ asset('assets/custom/css/app.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/custom/css/style.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/libraries/animate.css') }}" rel="stylesheet">
         <script>
             var HOME_URL = '{{url("/")}}';

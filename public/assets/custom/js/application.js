@@ -14,12 +14,14 @@ App.prototype = {
 		for (var k = 0; k < self.selectors.length; k++)
 			for (var i = 0; i < $(self.selectors[k]).length; i++) {
 				element = $(self.selectors[k] + ':eq(' + i + ')');
+				console.log(element);
 				u = p = '';
 				if (element.attr('data-url')) u = element.attr('data-url');
 				if (element.attr('data-post')) p = element.attr('data-post');
 
 				if (u.length >0) self.elements['sel'+i]= {controller:u,post:p};
 				element.removeAttr('data-url');
+				element.removeAttr('data-post');
 
 				if (u.length > 0&&$(self.selectors[k] + ':eq(' + i + ')').prop('tagName')!=='FORM') element.click(function (event) {
 					event.preventDefault();
@@ -72,7 +74,6 @@ App.prototype = {
 						values:valuesArray
 					};
 
-                    console.log(valuesArray);
 					if (self.elements['sel'+index].controller=='install/finish'){
 						post['DATABASE'] = DB;
 						post['USERS'] = USERS;
@@ -119,7 +120,13 @@ App.prototype = {
 					setTimeout(function () {
 						self.sendRequest(el);
 					}, 2000);
-				} else if ($('.wrapper_preload').length > 0) location.replace(HOME_URL+'/'+url); else alert('Cannot load page ' + url);
+				} else {
+					if ($('.wrapper_preload').length > 0) location.replace(HOME_URL + '/' + url);
+					else if (url !== '/login') self.showNotification({
+						type: "danger",
+						"text": LANG.page_load_error + '<br>URL: ' + HOME_URL + '/' + url
+					});
+				}
 			}
 		});
 		return false;
@@ -128,6 +135,8 @@ App.prototype = {
 		var self = this;
 
 		$.each(el, function (i, v) {
+			console.log(i);
+			console.log(el.length-1);
             if (v.action=='update') self.updateElement(v);
             if (v.action=='add') self.addElement(v);
             if (v.action=='hide') self.hideElement(v);
@@ -140,6 +149,7 @@ App.prototype = {
             if (v.action=='modal') self.showModal(v);
             if (v.action=='notification') self.showNotification(v);
             if (v.action=='addclass') self.aClass(v);
+			if (v.action=='redirect') window.location.href = v.href;
 
 
 			if (i == el.length - 1) {

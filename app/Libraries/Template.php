@@ -24,6 +24,7 @@ class Template extends BaseController{
 
     function __construct()
     {
+        session_start();
         $this->template = $this;
     }
 
@@ -48,8 +49,13 @@ class Template extends BaseController{
     public function render($view,$data = array(),$js = null,$target = '.body'){
 
 		if(!isAjax()) {
-				if(!empty(config('database.connections.DB0.host'))){
-					echo $this->view('template.header',$data);
+				if(!empty(config('database.connections.DB0.host'))) {
+                    echo $this->view('template.header', $data);
+                    if (isset($_SESSION['user']) and !empty($_SESSION['user']))
+                    {
+                        echo $this->view('template.top_bar',$data);
+                        echo $this->view('template.left_bar',$data);
+                    }
 					echo $this->view($view,$data);
 					echo $this->view('template.footer',$data);
 				}else{

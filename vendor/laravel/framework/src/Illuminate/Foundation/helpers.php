@@ -98,7 +98,7 @@ if (!function_exists('getDefaultLang')){
      */
 
     function getDefaultLang(){
-        return DB::table('languages')->select('code')->where([['isEnabled','=',1],['default','=',1]])->first()->code;
+        return \Illuminate\Support\Facades\App::getLocale();
     }
 }
 
@@ -110,21 +110,8 @@ if (!function_exists('lang')){
      */
 
     function lang(){
-        if(session()->has('lang')) session('lang',getDefaultLang());
-        return session('lang');
-    }
-}
-
-if (!function_exists('lang')){
-    /**
-     * Custom function to language from session.
-     *
-     * @return string
-     */
-
-    function lang(){
-        if(session()->has('lang')) session('lang',getDefaultLang());
-        return session('lang');
+        if(!isset($_SESSION['lang'])) $_SESSION['lang'] = getDefaultLang();
+        return $_SESSION['lang'];
     }
 }
 
@@ -137,7 +124,7 @@ if (!function_exists('translate')){
      */
 
     function translate($key){
-        $result = DB::table('translations')->select('text')->where([['key','=',$key],['lang','=',lang()]])->first();
+        $result = DB::table('acp_translations')->select('text')->where([['key','=',$key],['lang','=',lang()]])->first();
         if (count($result)<1){
             echo 'Cannnot found translation: <b>'.$key.'</b>';
             return ;

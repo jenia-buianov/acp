@@ -11,8 +11,13 @@
 |
 */
 
-Auth::routes();
-Route::group(['middleware' => 'auth'], function () {
-    Route::get('/', 'DashboardController@preload');
-    Route::post('/', 'DashboardController@index');
+Route::get('/', 'InstallController@preload');
+Route::get('{page}', function (){
+    return redirect('/');
 });
+Route::post('/', 'InstallController@start');
+Route::post('/setup', 'InstallController@setup');
+Route::post('/verify', 'InstallController@verify');
+Route::post('/findRows', 'InstallController@rows');
+Route::post('install/finish', 'InstallController@lastStep');
+

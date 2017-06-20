@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InstallController extends Controller
 {
@@ -111,7 +112,7 @@ class InstallController extends Controller
             }else{
 
                 // IF NOT ISSET DATABASE
-
+                $this->template->renderJson(array('action'=>'add','target'=>'text:eq(3) p','html'=>'<button class="btn btn-danger" type="submit" style="position: absolute; bottom: 0px; right: 2em;margin-bottom: 2em">'.__('install.finish').'</button>'));
                 $this->template->renderJson(array('action'=>'update','target'=>'text:eq(3) p',
                     'html'=>__('install.step4').'<br>
                     <br>
@@ -128,7 +129,7 @@ class InstallController extends Controller
                     </div>
 
                     <div class="form-group">
-                        <label class="sr-only">'.__('install.login').'/label>
+                        <label class="sr-only">'.__('install.login').'</label>
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-user" aria-hidden="true"></i>
@@ -158,7 +159,6 @@ class InstallController extends Controller
                     </div>'
                 ));
             }
-            $this->template->renderJson(array('action'=>'add','target'=>'text:eq(3) p','html'=>'<button class="btn btn-danger" type="submit" style="display:none;position: absolute; bottom: 0px; right: 2em;margin-bottom: 2em">'.__('install.finish').'</button>'));
         }
         return ;
     }
@@ -185,8 +185,6 @@ class InstallController extends Controller
             ));
             return ;
         }
-
-        exit;
 
         $userData = array(
             'name'=>$data['name'],
@@ -261,6 +259,10 @@ class InstallController extends Controller
         $file = fopen(dirname(__FILE__).'/../../../config/database.php','w');
         fwrite($file, $db_file);
         fclose($file);
+
+        DB::table('acp_users')->insert(array('groupId'=>1,'lang'=>App::getLocale(), 'login'=>$data['adminLogin'],'email'=>$data['adminEmail'],'password'=>bcrypt($data['adminPassword']),'name'=>$data['adminName']));
+        rename(dirname(__FILE__).'/../../../web.php',dirname(__FILE__).'/../../../routes/web.php');
+        $this->template->renderJson(array('action'=>'redirect','href'=>'/'));
 
     }
 
