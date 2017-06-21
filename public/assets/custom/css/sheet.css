@@ -293,7 +293,7 @@ ul.sidebar-menu li a{
     transition: all 0.3s ease;
 }
 
-ul.sidebar-menu li a.active, ul.sidebar-menu li a:hover, ul.sidebar-menu li a:focus {
+ul.sidebar-menu li a.active, ul.sidebar-menu li a:hover, ul.sidebar-menu li a:focus, .dropdown-menu.extended .new {
     background: #35404d;
     color: #fff;
     display: block;
@@ -404,7 +404,7 @@ ul.top-menu > li > a {
     margin-right: 15px;
 }
 
-ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
+ul.top-menu > li > a:hover, ul.top-menu > li > a:focus{
     border:1px solid #f0f0f8 !important;
     background-color: #fff!important;
     border-color: #f0f0f8 !important;
@@ -439,7 +439,13 @@ ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.176) !important;
     }
     }
-
+.dropdown-menu.extended .new, .dropdown-menu.extended .new span{
+    color:white;
+}
+.dropdown-menu.extended .new:hover, .dropdown-menu.extended .new:hover span
+{
+    color:#666666
+}
 .dropdown-menu.extended li p {
     background-color: #F1F2F7;
     color: #666666;
@@ -548,7 +554,7 @@ ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
 .dropdown-menu.extended.logout > li {
     float: left;
     text-align: center;
-    width: 33.3%;
+    width: 50%;
 }
 
 .dropdown-menu.extended.logout > li:last-child {
@@ -687,7 +693,7 @@ ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
     transition: all .3s ease;
     border: 1px solid #fff;
     box-shadow: none;
-    background: url("../img/search-icon.png") no-repeat 10px 8px;
+    background: url("../../images/search-icon.png") no-repeat 10px 8px;
     padding:0 5px 0 35px;
     color: #000;
 }

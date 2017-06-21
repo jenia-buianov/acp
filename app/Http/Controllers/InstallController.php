@@ -26,6 +26,8 @@ class InstallController extends Controller
 
     public function setup(Request $request){
         App::setLocale($request->lang);
+        setcookie('lang','',time()-3600);
+        setcookie('lang',$request->lang,time()+(7305*86400));
         return $this->template->render($this->folder.'start',array(),url('assets/custom/js/install.js'),'.container');
     }
 

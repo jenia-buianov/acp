@@ -22,7 +22,23 @@ body{
   margin-top:-10px;
 }
 
+.hidden-md-up{
+  display:block;
+}
 
+@media(min-width:768px) {
+
+  .hidden-md-up{
+
+    display:none;
+
+  }
+}
+@media(max-width: 768px){
+  .language .username, .top_profile .username{
+    display: none;
+  }
+}
 #preloader_2 {
   position: relative;
   left: 50%;

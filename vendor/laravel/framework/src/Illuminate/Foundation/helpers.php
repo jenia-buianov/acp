@@ -110,8 +110,11 @@ if (!function_exists('lang')){
      */
 
     function lang(){
-        if(!isset($_SESSION['lang'])) $_SESSION['lang'] = getDefaultLang();
-        return $_SESSION['lang'];
+        if(!isset($_COOKIE['lang'])) {
+            setcookie('lang',getDefaultLang(),time()+(7305*86400));
+            return getDefaultLang();
+        }
+        return $_COOKIE['lang'];
     }
 }
 

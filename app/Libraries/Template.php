@@ -8,10 +8,16 @@
 
 namespace App\Libraries;
 
+use App\Models\ChatModel;
+use App\Models\LangModel;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\UserModel;
+use App\Models\EmailModel;
+use App\Models\OnlineConsultantModel;
+use App\Models\NotificationModel;
 
 class Template extends BaseController{
 
@@ -46,15 +52,27 @@ class Template extends BaseController{
         self::$_response[] = $data;
     }
 
-    public function render($view,$data = array(),$js = null,$target = '.body'){
+    public function render($view,$data = array(),$js = null,$target = '#main-content .wrapper'){
 
 		if(!isAjax()) {
 				if(!empty(config('database.connections.DB0.host'))) {
                     echo $this->view('template.header', $data);
                     if (isset($_SESSION['user']) and !empty($_SESSION['user']))
                     {
-                        echo $this->view('template.top_bar',$data);
-                        echo $this->view('template.left_bar',$data);
+                        $_SESSION['user'] = (int)$_SESSION['user'];
+                        $user = UserModel::getUserById($_SESSION['user']);
+                        $data['user'] = $user;
+                        $data['countOCMessages'] = OnlineConsultantModel::myNewOnlineConsultantMessages();
+                        $data['countEMessages'] = EmailModel::myNewEmailMessages($_SESSION['user']);
+                        $data['countCMessages'] = ChatModel::myNewChatMessages($_SESSION['user']);
+                        $data['countNotifications'] = NotificationModel::myNewNotifications($_SESSION['user']);
+
+                        $data['OCMessages'] = OnlineConsultantModel::getLastMessages(5);
+                        $data['EMessages'] = EmailModel::getLastMessages($_SESSION['user'],3);
+                        $data['CMessages'] = ChatModel::getLastMessages($_SESSION['user'],3);
+                        $data['Notifications'] = NotificationModel::getLastNotifications($_SESSION['user'],5);
+                        $data['languages'] = LangModel::getLanguages();
+                        $data['titleLang'] = LangModel::getLanguageTitle(lang());
                     }
 					echo $this->view($view,$data);
 					echo $this->view('template.footer',$data);

@@ -18,7 +18,8 @@ trait  UserModelFields
                         'avatar' => 'avatar',
                         'regDate' => 'regDate',
                         'regTime' => 'regTime',
-                        'isEnabled' => 'isEnabled'
+                        'isEnabled' => 'isEnabled',
+                        'firstEnter' => 'firstEnter'
                         );
     function __construct()
     {

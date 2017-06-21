@@ -14,14 +14,15 @@ App.prototype = {
 		for (var k = 0; k < self.selectors.length; k++)
 			for (var i = 0; i < $(self.selectors[k]).length; i++) {
 				element = $(self.selectors[k] + ':eq(' + i + ')');
-				console.log(element);
-				u = p = '';
+				u = p =  h ='';
 				if (element.attr('data-url')) u = element.attr('data-url');
 				if (element.attr('data-post')) p = element.attr('data-post');
+				if (element.attr('data-history')) h = element.attr('data-history');
 
-				if (u.length >0) self.elements['sel'+i]= {controller:u,post:p};
+				if (u.length >0) self.elements['sel'+i]= {controller:u,post:p,history:h};
 				element.removeAttr('data-url');
 				element.removeAttr('data-post');
+				element.removeAttr('data-history');
 
 				if (u.length > 0&&$(self.selectors[k] + ':eq(' + i + ')').prop('tagName')!=='FORM') element.click(function (event) {
 					event.preventDefault();
@@ -99,14 +100,19 @@ App.prototype = {
 		post._token = $('#_token').val();
 		if (url.length == 0) return;
 		if (url=='/') url = '';
+		url = HOME_URL+'/'+url;
+		if (el.history&&el.history==1) window.history.pushState(el, '', url);
 		$.ajax({
-			url: HOME_URL + '/' + url,
+			url: url,
 			data: post,
 			method: 'POST',
 			dataType: "json",
 			success: function (data) {
 				APPLICATION.tryLoadPage = 0;
 				if ($('.wrapper_preload').length > 0) {
+					if ($('#tbar').length>0){
+						$('#tbar, #lbar').css('display','block');
+					}
 					$('.wrapper_preload').remove();
 					$('body').append(data[0].html);
 					self.removeAttributes();
@@ -121,10 +127,10 @@ App.prototype = {
 						self.sendRequest(el);
 					}, 2000);
 				} else {
-					if ($('.wrapper_preload').length > 0) location.replace(HOME_URL + '/' + url);
-					else if (url !== '/login') self.showNotification({
+					if ($('.wrapper_preload').length > 0) location.replace(url);
+					else if (url !== HOME_URL+'/login') self.showNotification({
 						type: "danger",
-						"text": LANG.page_load_error + '<br>URL: ' + HOME_URL + '/' + url
+						"text": LANG.page_load_error + '<br>URL: ' + url
 					});
 				}
 			}
@@ -135,8 +141,6 @@ App.prototype = {
 		var self = this;
 
 		$.each(el, function (i, v) {
-			console.log(i);
-			console.log(el.length-1);
             if (v.action=='update') self.updateElement(v);
             if (v.action=='add') self.addElement(v);
             if (v.action=='hide') self.hideElement(v);
@@ -326,6 +330,9 @@ App.prototype = {
 
 		if (el.js) $.getScript(el.js, function (data) {
 		});
+		if ($(el.target).length==0) {
+			$('body').append(el.html);
+		}else
 		$(el.target).html(el.html);
 	},
     removeModal: function (el) {
