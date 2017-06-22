@@ -16,11 +16,11 @@
     'connections'=>[
 'DB0'=>[
 'driver' => 'mysql',
-            'host' => 'localhost',
+            'host' => '31.22.4.254',
             'port' => '3306',
-            'database' => 'acp',
-            'username' => 'user',
-            'password' => '123456',
+            'database' => 'buianove_acp',
+            'username' => 'buianove_root',
+            'password' => 'Qq4541201096',
             'unix_socket' => '',
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
