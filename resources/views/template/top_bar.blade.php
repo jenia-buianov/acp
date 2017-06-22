@@ -4,8 +4,8 @@
             <i class="fa fa-bars"></i>
         </div>
         <!--logo start-->
-        <a href="/" data-url="/" class="ajax_request logo hidden-xs">Admin<span>Control</span>Panel</a>
-        <a href="/" data-url="/" class="ajax_request hidden-md-up logo">A<span>C</span>P</a>
+        <a href="/" data-url="/" data-history="1" class="ajax_request logo hidden-xs">Admin<span>Control</span>Panel</a>
+        <a href="/" data-url="/" data-history="1" class="ajax_request hidden-md-up logo">A<span>C</span>P</a>
         <!--logo end-->
         <div class="nav notify-row" id="top_menu">
             <!--  notification start -->
