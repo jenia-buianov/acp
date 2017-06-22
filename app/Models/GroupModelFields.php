@@ -8,7 +8,9 @@ trait  GroupModelFields
     public static $groupId = 'groupId';
 
     public static $rowsGroup = array(
-        'title'=>'titleKey',
-        'enabled'=>'isEnabled'
-    );
+                        'title' => 'titleKey',
+                        'enabled' => 'isEnabled'
+                        );
 }
+
+?>
