@@ -23,6 +23,7 @@ class UserModel extends Model{
             'u.'.UserModelFields::$rows['name'].' as name',
             'u.'.UserModelFields::$rows['lastname'].' as lastname',
             'u.'.UserModelFields::$rows['avatar'].' as avatar',
+            'u.'.UserModelFields::$rows['groupId'].' as groupId',
             'g.'.GroupModelFields::$rowsGroup['title'].' as group'
         )->join(GroupModelFields::$groupsTable.' as g','u.'.UserModelFields::$rows['groupId'],'=','g.'.GroupModelFields::$groupId)
             ->where('u.'.UserModel::$userId,$id)->first();

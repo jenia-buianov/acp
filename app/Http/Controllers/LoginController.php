@@ -38,7 +38,11 @@ class LoginController extends Controller{
             return $this->template->view('auth.login',array('title'=>translate('autorize'),'error'=>$error,'user'=>$userEnteredData));
         $_SESSION['user'] = $user->id;
         return redirect('/');
+    }
 
+    public function logout(){
+        unset($_SESSION['user']);
+        return redirect('/');
     }
 
 }

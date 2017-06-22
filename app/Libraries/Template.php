@@ -10,6 +10,7 @@ namespace App\Libraries;
 
 use App\Models\ChatModel;
 use App\Models\LangModel;
+use App\Models\MenuModel;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -73,6 +74,7 @@ class Template extends BaseController{
                         $data['Notifications'] = NotificationModel::getLastNotifications($_SESSION['user'],5);
                         $data['languages'] = LangModel::getLanguages();
                         $data['titleLang'] = LangModel::getLanguageTitle(lang());
+                        $data['leftMenu'] = MenuModel::getLeftMenu($user->groupId,$_SESSION['user']);
                     }
 					echo $this->view($view,$data);
 					echo $this->view('template.footer',$data);

@@ -28,7 +28,7 @@
                         @else
                             @foreach($OCMessages as $k=>$v)
                                 <li @if($v->seen==0) class="new" @endif>
-                                    <a href="#" class="ajax_request" data-history="1" data-url="/module/online_consultant/view/{{$v->id}}">
+                                    <a href="#" class="ajax_request" data-history="1" data-url="module/online_consultant/view/{{$v->id}}">
                                         <span class="photo">
                                             @if($v->user>0 and !empty($v->avatar)) <img alt="avatar" src="{{asset('assets/images/users/'.$v->avatar)}}"> @else <img alt="avatar" src="{{asset('assets/images/noavatar.png')}}"> @endif
                                         </span>
@@ -70,7 +70,7 @@
                         @else
                             @foreach($EMessages as $k=>$v)
                                 <li @if($v->seen==0) class="new" @endif>
-                                    <a href="#" class="ajax_request" data-history="1" data-url="/module/email/message/{{$v->id}}">
+                                    <a href="#" class="ajax_request" data-history="1" data-url="module/email/message/{{$v->id}}">
                                         <span class="subject">
                                     <span class="from">{{$v->from}}</span>
                                     <span class="time">{{date("H:i\nj.m.y",strtotime($v->date))}}</span>
@@ -97,7 +97,7 @@
                         @else
                             @foreach($CMessages as $k=>$v)
                                 <li @if($v->count>0) class="new" @endif>
-                                    <a href="#" class="ajax_request" data-history="1" data-url="/module/chat/message/{{$v->id}}">
+                                    <a href="#" class="ajax_request" data-history="1" data-url="module/chat/message/{{$v->id}}">
                                          <span class="photo">
                                             @if(!empty($v->avatar)) <img alt="avatar" src="{{asset('assets/images/users/'.$v->avatar)}}"> @else <img alt="avatar" src="{{asset('assets/images/noavatar.png')}}"> @endif
                                         </span>
@@ -142,7 +142,7 @@
                                 $type = json_decode($v->type);
                                 ?>
                                 <li @if($v->seen==0) class="new" @endif>
-                                    <a href="#" class="ajax_request" data-history="1" data-url="/module/notification/view/{{$v->id}}">
+                                    <a href="#" @if(!empty($v->link)) class="ajax_request" @if(isset($type->hisotry) and $type->hisotry==1) data-hisotry="1" @endif data-url="/module/notification/view/{{$v->id}}" @endif >
                                         <span class="label label-{{$type->class}}"><i class="fa fa-{{$type->icon}}"></i></span>
                                         <span class="small italic">{{date("H:i\nj.m.y",strtotime($v->date))}}</span>
                                     </a>

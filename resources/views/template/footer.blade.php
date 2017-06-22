@@ -1,6 +1,18 @@
 </section>
 </section>
 </section>
+
+@if(isset($_SESSION['user']))
+<div class="rightClickMenu">
+    <ul>
+        <li class="ajax_request" data-history="1" data-url="settings"><i class="fa fa-cogs" aria-hidden="true" style="font-size: 15px"></i> {{translate('settings')}}</li>
+        <li class="ajax_request" data-history="1" data-url="modules/add"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px"></i> {{translate('add_module')}}</li>
+        <li class="ajax_request" data-url="found_error"><i class="fa fa-exclamation-circle" aria-hidden="true" style="font-size: 15px"></i> {{translate('found_error')}}</li>
+        <li><a href="{{url('logout')}}"><i class="fa fa-key" aria-hidden="true" style="font-size: 12px"></i> {{translate('logout')}}</a></li>
+    </ul>
+</div>
+@endif
+
     <input type="hidden" name="_token" id="_token" value="{{ csrf_token() }}">
 
     <script src="{{asset('assets/custom/js/jquery.js')}}"></script>

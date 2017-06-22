@@ -82,8 +82,6 @@ App.prototype = {
 						post['PASS'] = PASSWORDS;
 						post['MAIN'] = MAINDB;
 					}
-
-                    console.log(post);
 					self.elements['sel'+index].post = JSON.stringify(post);
 					self.sendRequest(self.elements['sel'+index]);
 					return false;
@@ -116,6 +114,7 @@ App.prototype = {
 					$('.wrapper_preload').remove();
 					$('body').append(data[0].html);
 					self.removeAttributes();
+					self.rightClickMenu();
 				}
 				else
 				self.responseJob(data);
@@ -287,6 +286,7 @@ App.prototype = {
             $('modal:last-child content').css('display','block');
             $('modal:last-child content').animateCss(el.textEffect);
         },500);
+		self.getEsc();
     },
     showNotification: function (el) {
         var self = this;
@@ -318,7 +318,6 @@ App.prototype = {
 
     },
 	cssElement: function (el) {
-    	console.log(el);
 		$(el.target).css(el.css);
 	},
 	preloader: function () {
@@ -346,6 +345,28 @@ App.prototype = {
 
         });
     },
+	rightClickMenu: function () {
+		var self = this;
+		if (document.addEventListener) {
+			document.addEventListener('contextmenu', function (e) {
+				if ($('.rightClickMenu').length > 0) {
+					self.cssElement({
+						target: ".rightClickMenu",
+						css: {
+							display: "block",
+							left: e.x + "px",
+							top: e.y + "px"
+						}
+					});
+					e.preventDefault();
+				}
+			}, false);
+		}
+
+		$(document).on('click', function () {
+			$('.rightClickMenu').css('display','none');
+		});
+	}
 };
 
 $.fn.extend({

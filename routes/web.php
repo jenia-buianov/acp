@@ -18,4 +18,5 @@ Route::post('login','LoginController@verify');
 Route::group(['middleware' => 'custom_auth'], function () {
     Route::get('/', 'DashboardController@preload');
     Route::post('/', 'DashboardController@index');
+    Route::get('logout','LoginController@logout');
 });
