@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     private $folder = 'dashboard.';
-    private static $folder_static = 'dashboard.';
+    public static $folder_static = 'dashboard.';
 
     public function __construct()
     {

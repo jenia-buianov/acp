@@ -11,6 +11,7 @@ namespace App\Libraries;
 use App\Models\ChatModel;
 use App\Models\LangModel;
 use App\Models\MenuModel;
+use App\Models\StandardModel;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -24,24 +25,30 @@ class Template extends BaseController{
 
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    private static $_lang;
+    private static $_lang = null;
     private static $_response = array();
     private static $_userId = 0;
-    public $template;
+    public $template = null;
+    private $show = 1;
 
     function __construct()
     {
-        session_start();
-        $this->template = $this;
+        if(session_status() == PHP_SESSION_NONE) {
+            session_start();
+            $this->template = $this;
+        }
     }
-
 
     function __destruct()
     {
-        if(!empty(self::$_response)){
+        if(!empty(self::$_response)&&$this->show){
 			self::$_response = array_reverse(self::$_response);
 			echo json_encode(self::$_response);
 		}
+    }
+
+    public function setShow($num){
+        $this->show = (int)$num;
     }
 
 
@@ -53,8 +60,8 @@ class Template extends BaseController{
         self::$_response[] = $data;
     }
 
-    public function render($view,$data = array(),$js = null,$target = '#main-content .wrapper'){
-
+    public function render($view,$data = array(),$js = null,$target = '#main-content .wrapper', $title = ''){
+        if (empty($target)) $target = '#main-content .wrapper';
 		if(!isAjax()) {
 				if(!empty(config('database.connections.DB0.host'))) {
                     echo $this->view('template.header', $data);
@@ -90,7 +97,9 @@ class Template extends BaseController{
                 'target'=>$target
             );
             if (!is_null($js) or !empty($js)) $action['js'] = $js;
+            if (!empty($title)) $action['title'] = $title;
             $this->renderJson($action);
+            if (isset($_SESSION['user'])&&count(StandardModel::getEmailSettings())<5) $this->renderJson(array('action'=>'modal','html'=>$this->view('standard.smtp',array()),'notClosed'=>true,'onlyThis'=>true,'delPrev'=>true,'title'=>'SMTP Server'));
         }
         return ;
     }

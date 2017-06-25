@@ -19,4 +19,8 @@ Route::group(['middleware' => 'custom_auth'], function () {
     Route::get('/', 'DashboardController@preload');
     Route::post('/', 'DashboardController@index');
     Route::get('logout','LoginController@logout');
+    Route::post('settings/{name}', 'SettingsController@allSettings');
+    Route::post('module/{name}', 'ModulesController@openModule');
+    Route::get('module/{name}', 'DashboardController@preload');
+    Route::post('module/{name}/{action}', 'ModulesController@startAction');
 });

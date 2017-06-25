@@ -6,6 +6,7 @@ function App() {
 	this.preloader();
 	this.tryLoadPage = 0;
     this.notificationTimer = false;
+	this.APPS = {}
 }
 App.prototype = {
 
@@ -112,8 +113,7 @@ App.prototype = {
 						$('#tbar, #lbar').css('display','block');
 					}
 					$('.wrapper_preload').remove();
-					$('body').append(data[0].html);
-					self.removeAttributes();
+					self.responseJob(data);
 					self.rightClickMenu();
 				}
 				else
@@ -140,6 +140,7 @@ App.prototype = {
 		var self = this;
 
 		$.each(el, function (i, v) {
+			console.log(v);
             if (v.action=='update') self.updateElement(v);
             if (v.action=='add') self.addElement(v);
             if (v.action=='hide') self.hideElement(v);
@@ -153,7 +154,6 @@ App.prototype = {
             if (v.action=='notification') self.showNotification(v);
             if (v.action=='addclass') self.aClass(v);
 			if (v.action=='redirect') window.location.href = v.href;
-
 
 			if (i == el.length - 1) {
 				self.removeAttributes();
@@ -254,18 +254,12 @@ App.prototype = {
 
 	},
     showModal: function (el) {
+		console.log('HERE');
         var self = this;
         if($('modal').length>0&&self.modalWindowOnly) return ;
         if($('modal').length>0&&el.delPrev) $('modal').remove();
         if(el.onlyThis) self.modalWindowOnly = true;
         if (el.js) $.getScript(el.js, function(data) {});
-        if (el.loadCSS) {
-            $("<link/>", {
-                rel: "stylesheet",
-                type: "text/css",
-                href: el.loadCSS
-            }).appendTo("head");
-        }
         html = "<modal";
         if (el.modal&&!el.effect) html+=" style='"+el.modal+"'";
         if (!el.modal&&el.effect) html+=" style='display:inline;'";
@@ -274,11 +268,17 @@ App.prototype = {
         html+=">\n";
         if(el.notClosed) html+="<background></background>\n";
         else html+="<background onclick='APPLICATION.removeModal(this)'></background>\n";
+
+
         html+="<content";
+        if (el.title&&el.style) el.style+= "padding-top:calc(3em + 20px);";
+        if (el.title&&!el.style) el.style= "padding-top:calc(3em + 20px);";
         if (el.style) html+=" style='"+el.style+"'";
 
         html+=">"+el.html;
-        html+="</content><bottom></bottom></modal>";
+        html+="</content>\n";
+        if(el.title) html+="<top>"+el.title+"</top>\n";
+        html+="</modal>";
         $('body').append(html);
         if (el.effect) $('modal:last-child').animateCss(el.effect);
         else $('modal:last-child').fadeIn(300);
@@ -286,7 +286,7 @@ App.prototype = {
             $('modal:last-child content').css('display','block');
             $('modal:last-child content').animateCss(el.textEffect);
         },500);
-		self.getEsc();
+		if(!el.notClosed)self.getEsc();
     },
     showNotification: function (el) {
         var self = this;
@@ -326,9 +326,16 @@ App.prototype = {
 	},
 	loadPage: function (el) {
 		var self = this;
-
+		if (typeof self.APPS.timers !== 'undefined') {
+			for(k=0;k<self.APPS.timers;k++)
+				clearInterval(self.APPS.timers[k]);
+			delete self.APPS.timers;
+		}
+		delete self.APPS;
+		self.APPS = {};
 		if (el.js) $.getScript(el.js, function (data) {
 		});
+		if (el.title) $('head title').html(el.title);
 		if ($(el.target).length==0) {
 			$('body').append(el.html);
 		}else
