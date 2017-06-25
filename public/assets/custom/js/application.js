@@ -50,6 +50,7 @@ App.prototype = {
                                     'must': parseInt($(v).attr('must')),
                                     'title': v.placeholder
                                 };
+
                             }
                             else {
                                 if (v.placeholder == undefined) v.placeholder = $(v).attr('data-placeholder');
@@ -153,6 +154,7 @@ App.prototype = {
             if (v.action=='modal') self.showModal(v);
             if (v.action=='notification') self.showNotification(v);
             if (v.action=='addclass') self.aClass(v);
+            if (v.action=='setValue') self.setVal(v);
 			if (v.action=='redirect') window.location.href = v.href;
 
 			if (i == el.length - 1) {
@@ -160,6 +162,9 @@ App.prototype = {
 				self.setTimers();
 			}
 		});
+	},
+	setVal: function (el) {
+		$(el.target).val(el.val);
 	},
     aClass: function (el) {
         if (el.rt) $(el.target).removeClass(el.rt);

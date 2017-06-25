@@ -4,16 +4,11 @@
     </header>
     <div class="panel-body">
         <div class="col-xs-12 col-sm-8 col-md-10">
-            <div class="form-group">
-                <div class="input-group m-bot15">
-
-                    <input type="text" class="form-control" id="searchFileManager" placeholder="{{translate('search')}}">
-                    <span class="input-group-btn">
-                                                <button type="button" class="btn btn-white"><i class="fa fa-search"></i></button>
-                                              </span>
+            <form action="#" onsubmit="APPLICATION.APPS.FileManager.search()"  method="post" id="searchForm" style="display: inline;">
+                <div class="form-group " style="margin-bottom: 1em">
+                    <input id="query" type="text" class="form-control" name="query" must="1" placeholder="{{ translate('search') }}" style="background: url({{url('assets/images/search-icon.png')}}) no-repeat 10px 8px;padding: 0 5px 0 35px;">
                 </div>
-
-            </div>
+            </form>
             <form action="{{url('module/filemanager/upload')}}" method="post" id="UForm" enctype="multipart/form-data" style="display: inline;">
                <div class="fileupload fileupload-new" data-provides="fileupload" style="width: auto;    display: inline;">
                                                 <span class="btn btn-white btn-file">
@@ -24,7 +19,7 @@
                         <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none; margin-left:5px;"></a>
                </div>
 
-                <input name="path" value="<?php echo urldecode($path); ?>" type="hidden">
+                <input id="path" name="path" value="<?php echo urldecode($path); ?>" type="hidden">
                 <input name="_token" value="{{csrf_token()}}" type="hidden">
             </form>
 
@@ -32,7 +27,7 @@
                 <button data-toggle="button" class="btn btn-white active" aria-pressed="true" onclick="APPLICATION.APPS.FileManager.CreateFolder('<?php echo urldecode($path); ?>')">
                     <i class="fa fa-folder" style="color:#58c9f3"></i> {{translate('create_folder')}}  </button>
             </font>
-            <div id="DivFileManager" class="table-responsive" tabindex="1" style="outline: none;    overflow: auto;">
+            <div id="DivFileManager" class="table-responsive" tabindex="1" style="outline: none;    overflow: auto;margin-top: 1em">
                 @include('filemanager.files')
             </div>
         </div>

@@ -11,6 +11,28 @@
 @import "clickmenu";
 @import "modal";
 
+
+#DivFileManager::-webkit-scrollbar {
+  width: 6px;
+  height: 10px;
+  padding-top: 40px;
+}
+
+#DivFileManager::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 1px #333333;
+  background: transparent;
+  border-radius: 10px;
+
+}
+#DivFileManager::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  height: 30px;
+  width: 5px;
+  border: 1px solid transparent;
+  background: rgb(232, 64, 63);
+  cursor: pointer;
+}
+
 body{
   background-color: #f1f2f7;
 }

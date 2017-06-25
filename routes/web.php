@@ -23,4 +23,7 @@ Route::group(['middleware' => 'custom_auth'], function () {
     Route::post('module/{name}', 'ModulesController@openModule');
     Route::get('module/{name}', 'DashboardController@preload');
     Route::post('module/{name}/{action}', 'ModulesController@startAction');
+    Route::get('module/{name}/{action}', 'DashboardController@preload')->where('action','<>', 'download');
+    Route::get('module/filemanager/download', 'FileManagerController@download');
+
 });

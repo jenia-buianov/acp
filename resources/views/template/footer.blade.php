@@ -27,6 +27,7 @@
     <script src="{{asset('assets/custom/js/select.min.js')}}" ></script>
     <script src="{{asset('assets/custom/js/slidebars.min.js')}}" ></script>
     <script src="{{asset('assets/custom/js/common-scripts.js')}}" ></script>
+    <script src="{{asset('assets/custom/js/clipboard.min.js')}}" ></script>
 @endif
     <script src="{{asset('assets/languages/'.lang().'.js')}}"></script>
     <script>

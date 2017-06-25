@@ -60,7 +60,7 @@ class FileManagerController extends Controller
                 else $icon[] = 'file-o';
                 $size[] = $this->formatSizeUnits((int)filesize(dirname(__FILE__)."/../../../".$path.'/'.$name));
                 $ph = 'module/filemanager/download';
-                $post[] = data_to_attribute(array('download'=>urlencode($path.'/'.$name)));
+                $post[] = data_to_attribute(array('path'=>mb_substr(urlencode($path.'/'.$name),1)));
             }
             else {
                 $post[] = data_to_attribute(array('path'=>urlencode($path.'/'.$name)));
@@ -95,7 +95,7 @@ class FileManagerController extends Controller
     }
 
     public function info(Request $request){
-        if (!empty($request->path)) $path = urlencode($request->path);
+        if (!empty($request->path)) $path = urldecode($request->path);
         else $path = '.';
 
         if ($path!=='.') $dir = opendir(dirname(__FILE__)."/../../../".$path);
@@ -105,7 +105,8 @@ class FileManagerController extends Controller
         while($name = readdir($dir))  $files_[] = $name;
         sort($files_);
         $icon = $size = '';
-        $file = htmlspecialchars($request->file,3);
+        if(isset($request->file) and !empty($request->file)) $file = htmlspecialchars($request->file,3);
+        else $file = htmlspecialchars($request->q,3);
         foreach($files_ as $key=>$name) {
             if ($name==$file){
                 if (is_file(dirname(__FILE__) . "/../../../" . $path . '/' . $name)) {
@@ -122,7 +123,7 @@ class FileManagerController extends Controller
 
         $this->renderJson(array('action'=>'update','target'=>'#fileInfo','html'=>view($this->folder.'info')->with(
             array(
-                'file'=>url($path . '/' . $name),
+                'file'=>$path . '/' . $file,
                 'name'=>$file,
                 'path'=>$path,
                 'size'=>$size,
@@ -135,6 +136,7 @@ class FileManagerController extends Controller
         if (!empty($request->path)) $path = urldecode($request->path);
         else $path = '.';
         $this->renderJson(array('action'=>'update','target'=>'#DivFileManager','html'=>view($this->folder.'files')->with($this->getFiles($path))->render()));
+        $this->renderJson(array('action'=>'setValue','target'=>'#path','val'=>$path));
         $this->setShow(0);
     }
 
@@ -143,7 +145,7 @@ class FileManagerController extends Controller
         else $path = '.';
         $name = htmlspecialchars($request->folder,3);
         if (is_dir(dirname(__FILE__) . "/../../../" . $path . '/' . $name)) {
-                $this->template->renderJson(array(
+                $this->renderJson(array(
                     'action'=>'notification',
                     'text'=>translate('folder_exist'),
                     'type'=>'danger'
@@ -152,6 +154,11 @@ class FileManagerController extends Controller
                 return ;
         }
         mkdir(dirname(__FILE__) . "/../../../" . $path . '/' . $name,0700);
+        $this->renderJson(array(
+            'action'=>'notification',
+            'text'=>translate('folder_created').' '.$name,
+            'type'=>'success'
+        ));
 
         $this->renderJson(array('action'=>'update','target'=>'#DivFileManager','html'=>view($this->folder.'files')->with($this->getFiles($path))->render()));
         $this->setShow(0);
@@ -197,6 +204,83 @@ class FileManagerController extends Controller
             }
             exit;
         }
+    }
+
+    public function download(Request $request)
+    {
+        if ($request->isMethod('post')){
+            $this->renderJson(array('action'=>'redirect','href'=>url('module/filemanager/download/?path='.$request->path)));
+            $this->setShow(0);
+            return ;
+        }
+        $file = urldecode(htmlspecialchars($request->path, 3));
+        $type = explode('/', $file);
+        $fn = explode('.', $type[count($type) - 1]);
+        $filename = $url = array();
+        for ($i = 0; $i < count($fn) - 1; $i++)
+        $filename[] = $fn[$i];
+        for ($i = 0; $i < count($type) - 1; $i++)
+            if(!empty($type[$i]) and $type[$i]!=='.') $url[] = $type[$i];
+
+        $filename = implode('.',$filename).'.'.$fn[count($fn)-1];
+
+        return response()->download(storage_path('/../'.$file), $filename);
+    }
+
+    public function search(Request $request){
+        if (!empty($request->path) and $request->path!='.') $path = mb_substr(urldecode($request->path),1);
+        else $path = '';
+        $query = htmlspecialchars($request->q,3);
+        if (!empty($query)) $query = dirname(__FILE__) . "/../../../" . $path."/*$query*";
+        else {
+            $this->open($request);
+            return ;
+        }
+
+        foreach (glob($query) as $filename) {
+            $fname = explode('/',$filename);
+            $name = $fname[count($fname)-1];
+            $files_[] = $name;
+            if (is_file($filename)) {
+                $getExtenstion = explode('.', $filename);
+                if (in_array($getExtenstion[count($getExtenstion) - 1], $this->extensions)) $icon[] = $this->icons[array_search($getExtenstion[count($getExtenstion) - 1], $this->extensions)];
+                else $icon[] = 'file-o';
+                $size[] = $this->formatSizeUnits((int)filesize($filename));
+                $ph = 'module/filemanager/download';
+                $post[] = data_to_attribute(array('path' => mb_substr(urlencode($path.'/'.$name), 1)));
+            }
+            else {
+                    $post[] = data_to_attribute(array('path'=>urlencode($path.'/'.$name)));
+                    $ph = 'module/filemanager/open';
+                    $icon[] = 'folder';
+                    $size[] = '-';
+                }
+            $url[] = $ph;
+        }
+
+        if(!empty($files_))
+        $this->renderJson(array('action'=>'update','target'=>'#DivFileManager','html'=>view($this->folder.'files')->with(
+            array(
+                'path'=>$path,
+                'url'=>$url,
+                'size'=>$size,
+                'files'=>$files_,
+                'icon'=>$icon,
+                'post'=>$post
+            ))->render()));
+        else $this->renderJson(array('action'=>'update','target'=>'#DivFileManager','html'=>translate('not_found')));
+        $this->setShow(0);
+    }
+
+    public function rename(Request $request){
+        if (!empty($request->path)) $path = urldecode($request->path);
+        else $path = '.';
+        if (!is_file(dirname(__FILE__) . "/../../../" . $path."/".htmlspecialchars($request->old,3)) and !is_dir(dirname(__FILE__) . "/../../../" . $path."/".htmlspecialchars($request->old,3)))
+            return ;
+        rename(dirname(__FILE__) . "/../../../" . $path."/".htmlspecialchars($request->old,3),dirname(__FILE__) . "/../../../" . $path."/".htmlspecialchars($request->q,3));
+        $this->open($request);
+        $this->info($request);
+
     }
 
 }
